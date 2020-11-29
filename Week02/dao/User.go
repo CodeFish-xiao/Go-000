@@ -39,15 +39,12 @@ func GetUserByAge(age int) ([]User, error) {
 	rows, err := db.Query("select id,name,age from user where age =? ", age)
 	var userList []User
 	if err != nil {
-		return nil, errors.Wrap(err, "数据库错误")
+		return nil, errors.Wrapf(err, "数据库错误")
 	}
 	//没数据就返回空数组
-	if !rows.Next() {
-		return make([]User, 0), nil
-	}
 	for rows.Next() {
 		u := User{}
-		rows.Scan(&u.Id, &u.Name, u.Age)
+		_ = rows.Scan(&u.Id, &u.Name, &u.Age)
 		userList = append(userList, u)
 	}
 	return userList, nil
