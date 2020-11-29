@@ -28,7 +28,7 @@ func (u *User) GetUserById() error {
 	//查询数据，指定字段名，返回sql.Rows结果集
 	err = db.QueryRow("select id,name,age from user where id =? ", u.Id).Scan(&u.Id, &u.Name, &u.Age)
 	if err != nil {
-		return errors.Wrap(err, "数据库没有数据！")
+		return errors.Wrap(err, "数据库为空")
 	}
 	return nil
 }
@@ -39,7 +39,7 @@ func GetUserByAge(age int) ([]User, error) {
 	rows, err := db.Query("select id,name,age from user where age =? ", age)
 	var userList []User
 	if err != nil {
-		return nil, errors.Wrapf(err, "数据库错误")
+		return nil, errors.WithStack(err)
 	}
 	//没数据就返回空数组
 	for rows.Next() {
