@@ -3,6 +3,7 @@ package main
 import (
 	"Week02/service"
 	"fmt"
+	"github.com/pkg/errors"
 	"log"
 )
 
@@ -15,7 +16,7 @@ func main() {
 	fmt.Println(userlist)
 	user, err := service.UserService.GetUserInfo(34234)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal(errors.Cause(err))
 	} else {
 		fmt.Println(user)
 	}
