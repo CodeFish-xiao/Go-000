@@ -11,12 +11,12 @@ func main() {
 	//直接模拟调用
 	userlist, err := service.UserService.GetUserByAge(123)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("%v", errors.Cause(err))
 	}
 	fmt.Println(userlist)
-	user, err := service.UserService.GetUserInfo(34234)
+	user, err := service.UserService.GetUserInfo(345)
 	if err != nil {
-		log.Fatal(errors.Cause(err))
+		log.Fatalf("%v", err)
 	} else {
 		fmt.Println(user)
 	}

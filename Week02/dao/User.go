@@ -39,7 +39,7 @@ func GetUserByAge(age int) ([]User, error) {
 	rows, err := db.Query("select id,name,age from user where age =? ", age)
 	var userList []User
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, errors.Wrap(err, "数据库错误")
 	}
 	//没数据就返回空数组
 	for rows.Next() {
