@@ -1,6 +1,6 @@
 package service
 
-import "Week02/dao"
+import "homework/dao"
 
 type IUserService interface {
 	//获取y用户详细信息

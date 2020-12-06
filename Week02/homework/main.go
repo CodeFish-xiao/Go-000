@@ -1,9 +1,9 @@
 package main
 
 import (
-	"Week02/service"
 	"fmt"
 	"github.com/pkg/errors"
+	"homework/service"
 	"log"
 )
 

@@ -1,4 +1,4 @@
-module Week02
+module homework
 
 go 1.15
 
