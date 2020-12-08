@@ -8,10 +8,50 @@
 当信号发送到某个进程中时，操作系统会中断该进程的正常流程，并进入相应的信号处理函数执行操作，完成后再回到中断的地方继续执行。
 如果目标进程先前注册了某个信号的处理程序(signal handler),则此处理程序会被调用，否则缺省的处理程序被调用。
 
-## 在Go程序中signal的默认行为
+## Golang中怎么调用它呢？
+golang中提供了signal对于信号的操作
+~~~go
+func Ignore(sig ...os.Signal)//忽略
+func Ignored(sig os.Signal) bool//判断是否被忽略
+func Notify(c chan<- os.Signal, sig ...os.Signal)//唤醒
+func Reset(sig ...os.Signal)//重置
+func Stop(c chan<- os.Signal)//停止
+~~~
+**Ignore**
+~~~go
+func Ignore(sig ...os.Signal)
+~~~
+Ignore将忽略提供的信号。如果程序接收到它们，则不会发生任何事情。Ignore将撤消先前对提供的信号进行通知的任何调用的影响。如果未提供信号，则所有输入信号都将被忽略。
 
-默认情况下，同步信号会转换为运行时紧急情况。SIGHUP，SIGINT或SIGTERM信号导致程序退出。SIGQUIT，SIGILL，SIGTRAP，SIGABRT，SIGSTKFLT，SIGEMT或SIGSYS信号会导致程序以堆栈转储退出。SIGTSTP，SIGTTIN或SIGTTOU信号获得系统默认行为（shell将这些信号用于作业控制）。SIGPROF信号由Go运行时直接处理以实现runtime.CPUProfile。其他信号将被捕获，但不会采取任何措施。
+**Ignored**
+~~~go
+func Ignored(sig os.Signal) bool
+~~~
+Ignored报告当前信号是否忽略。
 
-如果Go程序在忽略SIGHUP或SIGINT的情况下启动（信号处理程序设置为SIG_IGN），则它们将保持忽略状态。
+**Notify**
+~~~go
+func Notify(c chan<- os.Signal, sig ...os.Signal)
+~~~
+Notify使包信号将传入信号转发给c，如果没有信号，则将所有传入信号转发给c，否则仅发送提供的信号。
 
-如果Go程序以非空的信号掩码启动，通常会很荣幸。但是，某些信号被明确地解除了阻塞：同步信号SIGILL，SIGTRAP，SIGSTKFLT，SIGCHLD，SIGPROF，以及在GNU / Linux上，信号32（SIGCANCEL）和33（SIGSETXID）（glibc在内部使用了SIGCANCEL和SIGSETXID）。由os.Exec或os / exec程序包启动的子进程将继承修改后的信号掩码。
+包信号不会阻塞发送给c:调用者必须确保c有足够的缓冲区空间来保持预期的信号速率。对于只用于通知一个信号值的通道，大小为1的缓冲区就足够了。
+
+允许使用同一通道多次调用Notify:每次调用扩展发送到该通道的信号集。从集合中移除信号的唯一方法是调用Stop。
+
+允许使用不同的通道和相同的信号多次调用通知:每个通道分别接收传入信号的副本。
+
+**Reset**
+~~~go
+func Reset(sig ...os.Signal)
+~~~
+Reset将解除任何先前调用的效果，以通知所提供的信号。如果没有提供信号，所有信号处理程序将被重置。
+
+**Stop**
+~~~go
+func Stop(c chan<- os.Signal)
+~~~
+Stop使包信号停止向c中继传入信号，解除之前所有调用的效果，使用c通知。当Stop返回时，保证c不会再收到信号。
+
+
+[这里有包的具体描述](./singnal包描述.md)也可看官方文档（链接是我机翻的）
