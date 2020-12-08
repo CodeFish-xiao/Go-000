@@ -12,25 +12,28 @@ import (
 	"time"
 )
 
-/*
-流程：开启HTTP服务器
-*/
-
 // 首先要搞一个http服务
 type Server struct {
 	srv *http.Server
 }
 
+type GetHandler struct {
+}
+
+func (h *GetHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	w.WriteHeader(200)
+	//模拟耗时请求
+	fmt.Println("进入请求")
+	time.Sleep(100 * time.Second) //若是在请求过程中被停止就会报错
+	_, _ = w.Write([]byte("进入请求"))
+}
+
 // 创建http服务，并模拟一个耗时接口
 func NewServer() *Server {
 	mux := http.NewServeMux()
-	mux.Handle("/", http.HandlerFunc(
-		func(w http.ResponseWriter, r *http.Request) {
-			//模拟耗时请求
-			fmt.Println("进入请求")
-			time.Sleep(100 * time.Second) //若是在请求过程中被停止就会报错
-		},
-	))
+	mux.Handle("/get", &GetHandler{})
+
 	srv := &http.Server{
 		Addr:    ":8080",
 		Handler: mux,
